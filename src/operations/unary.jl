@@ -68,6 +68,8 @@ function /(arg1::Tensor, arg2::Number)
     arg2 = 1/arg2
     return arg1 * arg2
 end
+
+# scalar division (k/tensor)
 function /(arg1::Number, arg2::Tensor)
     val = arg1 ./ arg2.data
     _op = "/"
@@ -124,7 +126,29 @@ function Base.getindex(arg::Tensor, idx...)
     return Tensor(val, (arg, (idx...)), _op)
 end
 
-# Reshape
+# RESHAPING OPERATIONS
+
+# Naive broadcasting along 1 dimension
+function broadcast( arg::Tensor, newshape::Tuple) # only from n-1 to n dimensions
+    arr = arg.data
+    shp = arg.shape
+    
+    @assert length(shp) == length(newshape)
+    idx = nothing
+    for i in 1:length(shp)
+        if shp[i] != newshape[i] && shp[i] == 1
+            idx = i
+        end
+    end
+    
+    rep = ones(Int, length(newshape))
+    rep[idx] = newshape[idx]
+    
+    arr_new = repeat(arr, outer= rep)
+    _op = "broadcast"
+        
+    return Tensor(arr_new, (arg, shp, idx), _op )
+end
 
 
 # BINARY OPERATIONS
@@ -167,3 +191,16 @@ end
 function /(arg1::Tensor, arg2::Tensor)
     return elemwise(arg1, 1/arg2)
 end
+
+# AGGREGATION
+
+# Sum along some dimension
+import Base:sum
+function sum(arg::Tensor, dims::Integer)
+    val = sum(arg.data, dims = dims)
+    _op = "sum"
+    return Tensor(val, (arg, dims), _op)
+end
+
+
+

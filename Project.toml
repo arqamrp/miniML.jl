@@ -1,0 +1,13 @@
+name = "miniML"
+uuid = "ea17becf-3630-430c-9e28-25197c2769bc"
+authors = ["Arqam Patel"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
